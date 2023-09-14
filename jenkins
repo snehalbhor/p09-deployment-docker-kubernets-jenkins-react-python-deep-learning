@@ -12,7 +12,7 @@ pipeline {
             steps {
                 checkout([$class: 'GitSCM', branches: [[name: '*/main']], doGenerateSubmoduleConfigurations: false, 
                 extensions: [], submoduleCfg: [],
-                userRemoteConfigs: [[url: 'https://github.com/snehalbhor/p08-deployment-docker-kubernets-react-python-deep-learning.git']]])
+                userRemoteConfigs: [[url: 'https://github.com/snehalbhor/p09-deployment-docker-kubernets-jenkins-react-python-deep-learning']]])
             }
         }
         
