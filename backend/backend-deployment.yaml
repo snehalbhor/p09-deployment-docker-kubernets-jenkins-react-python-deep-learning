@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: snehalbhor/python_backend  # Replace with the actual image name
+          image: snehalbhor/python_backend:v1 # Replace with the actual image name
           imagePullPolicy: Always
           ports:
             - containerPort: 5000
