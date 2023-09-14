@@ -1,0 +1,110 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials("id1")
+        
+    }
+    
+    stages{
+        
+        stage('Checkout') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], doGenerateSubmoduleConfigurations: false, 
+                extensions: [], submoduleCfg: [],
+                userRemoteConfigs: [[url: 'https://github.com/snehalbhor/p08-deployment-docker-kubernets-react-python-deep-learning.git']]])
+            }
+        }
+        
+        
+        
+        stage('Build Frontend Docker Image') {
+           
+            steps {
+                dir('frontend') {
+                    // Build a Docker image for the frontend.
+                    script {
+                        // def frontendImageName = "snehalbhor/react_frontend:v1"
+                        sh 'docker build -t snehalbhor/react_frontend:v1 .'
+
+                        
+                    }
+                }
+
+                // Push the frontend Docker image to DockerHub.
+               
+            }
+            
+            
+        }
+
+        stage('DockerHub Login') {
+              steps {
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+              }
+            }
+
+        stage('Frontend Image Push') {
+            steps {
+                sh 'docker push snehalbhor/react_frontend:v1'
+                }
+            }
+
+        stage('Build Backend Docker Image') {
+           
+            steps {
+                dir('backend') {
+                    
+                    script {
+                        
+                        sh 'docker build -t snehalbhor/python_backend:v1 .'
+
+                        
+                    }
+                }  
+            }  
+        }
+
+       stage('Backend Image Push') {
+            steps {
+                sh 'docker push snehalbhor/python_backend:v1'
+          
+            }
+        }
+
+        stage('Navigate to Frontend Folder and Apply Frontend Kubernetes Configuration') {
+            steps {
+                dir('frontend') {
+                    // You are now inside the 'frontend' folder
+                    script {
+                        def fileNames = sh(returnStdout: true, script: 'ls').trim()
+                        // 'fileNames' will contain a string with the list of filenames separated by spaces or newline characters
+                        echo "File Names in 'frontend' directory: ${fileNames}"
+
+                        sh 'kubectl apply -f frontend-deployment.yaml'
+                    }
+                }
+            }
+        }
+        
+        stage('Navigate to Backend Folder and Apply Backend Kubernetes Configuration') {
+            steps {
+                dir('backend') {
+                    // You are now inside the 'frontend' folder
+                    script {
+                        def fileNames = sh(returnStdout: true, script: 'ls').trim()
+                        // 'fileNames' will contain a string with the list of filenames separated by spaces or newline characters
+                        echo "File Names in 'backend' directory: ${fileNames}"
+
+                        sh 'kubectl apply -f backend-deployment.yaml'
+                    }
+                }
+            }
+        }
+        
+
+
+    }
+
+  
+}

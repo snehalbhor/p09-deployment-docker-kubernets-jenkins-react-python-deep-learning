@@ -1,0 +1,18 @@
+kubectl delete pods,services,deployments --all
+docker tag my-local-image:tag localhost:5000/my-local-image:tag
+systemctl start kubelet
+systemctl status kubelet
+minikube start
+minikube status
+kubectl get pod
+kubectl apply -f backend-deployment.yaml
+kubectl describe pod frontend-deployment-846fcc5d85-7mfl6
+kubectl get nodes -o wide
+http://<node-ip>:30049
+choose internal ip and nodeport
+
+internal ip:192.168.49.2
+
+
+
+
